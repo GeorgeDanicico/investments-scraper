@@ -1,0 +1,96 @@
+openapi: 3.0.3
+info:
+  title: Investment Price API
+  version: 1.0.0
+  description: Returns the latest available price for supported stocks, ETFs, and investment funds.
+servers:
+  - url: /
+tags:
+  - name: Prices
+    description: Latest prices for stocks, ETFs, and investment funds
+paths:
+  /api/v1/price/{instrument}:
+    get:
+      tags:
+        - Prices
+      operationId: getPrice
+      summary: Get the latest price
+      description: Routes BTEUROCLASIC to ZF and other supported instruments to Yahoo Finance.
+      parameters:
+        - name: instrument
+          in: path
+          required: true
+          description: Ticker or fund identifier.
+          example: VUAA.DE
+          schema:
+            type: string
+            pattern: '^[A-Za-z0-9][A-Za-z0-9.-]{0,19}$'
+      responses:
+        '200':
+          description: Price found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceResponse'
+        '400':
+          description: The instrument identifier is invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceErrorResponse'
+        '404':
+          description: The upstream source returned no price
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceErrorResponse'
+        '502':
+          description: The upstream source could not be reached
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceErrorResponse'
+components:
+  schemas:
+    PriceResponse:
+      type: object
+      required:
+        - instrument
+        - source
+        - price
+        - currency
+        - asOf
+      properties:
+        instrument:
+          type: string
+          description: Requested instrument identifier.
+          example: VUAA.DE
+        source:
+          $ref: '#/components/schemas/PriceSource'
+        price:
+          type: number
+          description: Latest available price.
+          example: 127.865
+        currency:
+          type: string
+          description: ISO 4217 currency code.
+          example: EUR
+        asOf:
+          type: string
+          description: Timestamp or date supplied by the upstream source.
+          example: '2026-09-11T15:36:06Z'
+    PriceSource:
+      type: string
+      description: Upstream provider used for the price.
+      enum:
+        - YAHOO_FINANCE
+        - ZF
+    PriceErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          description: Human-readable error message.
+          example: 'Invalid instrument: invalid symbol'
