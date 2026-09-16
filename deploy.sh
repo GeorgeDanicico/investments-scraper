@@ -70,6 +70,7 @@ fi
 echo "Starting container: $CONTAINER_NAME"
 docker run --detach \
     --name "$CONTAINER_NAME" \
+    --network expense-network \
     --restart unless-stopped \
     --publish "$HOST_PORT:$CONTAINER_PORT" \
     --mount "type=volume,source=$LOG_VOLUME,target=/app/logs" \
