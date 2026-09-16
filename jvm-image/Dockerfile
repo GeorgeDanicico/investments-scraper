@@ -28,4 +28,6 @@ USER appuser
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "/app/investment.jar"]
+ENTRYPOINT ["java"]
+
+CMD ["-Xms16m", "-Xmx96m", "-Xss512k", "-XX:MaxMetaspaceSize=64m", "-XX:MaxDirectMemorySize=16m", "-XX:+UseSerialGC", "-jar", "/app/investment.jar"]

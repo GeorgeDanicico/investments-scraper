@@ -13,7 +13,7 @@ COPY src src
 
 # Native Image compilation is memory-intensive. Limiting parallelism reduces
 # peak memory usage at the cost of a slower build.
-ENV NATIVE_IMAGE_OPTIONS="--parallelism=1"
+ENV NATIVE_IMAGE_OPTIONS="--parallelism=1 --gc=serial -Os"
 
 RUN ./mvnw -Pnative clean native:compile -DskipTests
 
@@ -32,3 +32,5 @@ USER appuser
 EXPOSE 8080
 
 ENTRYPOINT ["/app/investment"]
+
+CMD ["-Xms16m", "-Xmx64m"]

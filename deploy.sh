@@ -17,9 +17,14 @@ STOP_TIMEOUT="${STOP_TIMEOUT:-30}"
 case "$DEPLOY_VARIANT" in
     native)
         DOCKERFILE_PATH="${DOCKERFILE_PATH:-native-image/Dockerfile}"
+        NATIVE_RUNTIME_OPTIONS="${NATIVE_RUNTIME_OPTIONS:--Xms16m -Xmx64m}"
+        read -r -a APP_COMMAND <<< "$NATIVE_RUNTIME_OPTIONS"
         ;;
     jvm)
         DOCKERFILE_PATH="${DOCKERFILE_PATH:-jvm-image/Dockerfile}"
+        JVM_RUNTIME_OPTIONS="${JVM_RUNTIME_OPTIONS:--Xms16m -Xmx96m -Xss512k -XX:MaxMetaspaceSize=64m -XX:MaxDirectMemorySize=16m -XX:+UseSerialGC}"
+        read -r -a APP_COMMAND <<< "$JVM_RUNTIME_OPTIONS"
+        APP_COMMAND+=("-jar" "/app/investment.jar")
         ;;
     *)
         echo "Unsupported DEPLOY_VARIANT: $DEPLOY_VARIANT (expected native or jvm)" >&2
@@ -74,7 +79,8 @@ docker run --detach \
     --restart unless-stopped \
     --publish "$HOST_PORT:$CONTAINER_PORT" \
     --mount "type=volume,source=$LOG_VOLUME,target=/app/logs" \
-    "$IMAGE_NAME"
+    "$IMAGE_NAME" \
+    "${APP_COMMAND[@]}"
 
 if command -v curl >/dev/null 2>&1; then
     echo "Waiting for the application health endpoint..."

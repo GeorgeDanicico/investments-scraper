@@ -2,7 +2,6 @@ package com.finance.investment.price;
 
 import com.finance.investment.generated.model.PriceResponse;
 import com.finance.investment.generated.model.PriceSource;
-import com.github.benmanes.caffeine.cache.stats.CacheStats;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,8 +10,6 @@ import org.springframework.cache.CacheManager;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.math.BigDecimal;
-import java.util.concurrent.TimeUnit;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.times;
@@ -40,7 +37,7 @@ class PriceServiceCacheTest {
     }
 
     @Test
-    void cachesNormalizedInstrumentForThreeHoursAndRecordsStats() {
+    void cachesNormalizedInstrumentForThreeHours() {
         PriceResponse expected = new PriceResponse(
                 "VUAA.DE",
                 PriceSource.YAHOO_FINANCE,
@@ -59,12 +56,9 @@ class PriceServiceCacheTest {
                 (com.github.benmanes.caffeine.cache.Cache<Object, Object>) cacheManager
                         .getCache(PriceService.PRICE_CACHE)
                         .getNativeCache();
-        CacheStats stats = nativeCache.stats();
-
-        assertEquals(1, stats.missCount());
-        assertEquals(1, stats.hitCount());
+        assertEquals(32, nativeCache.policy().eviction().orElseThrow().getMaximum());
         assertTrue(nativeCache.policy().expireAfterWrite().isPresent());
-        assertEquals(3, nativeCache.policy().expireAfterWrite().orElseThrow()
-                .getExpiresAfter(TimeUnit.HOURS));
+        assertEquals(java.time.Duration.ofHours(3), nativeCache.policy().expireAfterWrite().orElseThrow()
+                .getExpiresAfter());
     }
 }

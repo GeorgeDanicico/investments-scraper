@@ -27,4 +27,24 @@ class ZfPriceParserTest {
         assertEquals("2026-09-09", response.getAsOf());
         assertEquals(PriceSource.ZF, response.getSource());
     }
+
+    @Test
+    void handlesNestedElementsBeforeThePrice() {
+        String html = """
+                <div class="fond-mutual">
+                    <div style="padding-left: 5px; float:right">
+                        <div id="div_chart_1"></div>
+                        <div id="div_chart_2"></div>
+                    </div>
+                    <p><strong>13,5180 eur</strong></p>
+                    <p style="font-size:11px">VUAN din data de 2026-09-15</p>
+                </div>
+                """;
+
+        PriceResponse response = ZfPriceParser.parse("BTEUROCLASIC", html);
+
+        assertEquals(new BigDecimal("13.5180"), response.getPrice());
+        assertEquals("EUR", response.getCurrency());
+        assertEquals("2026-09-15", response.getAsOf());
+    }
 }
