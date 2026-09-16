@@ -24,6 +24,7 @@ public class ZfPriceClient {
 
         this.restClient = restClientBuilder
                 .requestFactory(requestFactory)
+                .defaultHeader("User-Agent", "investment-price-service/1.0")
                 .build();
         this.url = properties.zfBtEuroClasicUrl();
     }

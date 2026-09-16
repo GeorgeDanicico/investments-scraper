@@ -27,6 +27,7 @@ public class YahooPriceClient {
         this.restClient = restClientBuilder
                 .requestFactory(requestFactory)
                 .baseUrl(properties.yahooBaseUrl())
+                .defaultHeader("User-Agent", "investment-price-service/1.0")
                 .build();
     }
 
