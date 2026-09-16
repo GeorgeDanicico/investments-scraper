@@ -1,0 +1,13 @@
+# Keep Docker/Apple Container build contexts limited to application inputs.
+*
+
+!mvnw
+!pom.xml
+!.mvn
+!.mvn/**
+!src
+!src/**
+!native-image
+!native-image/**
+!jvm-image
+!jvm-image/**

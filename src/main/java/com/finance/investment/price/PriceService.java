@@ -23,8 +23,7 @@ public class PriceService {
 
     @Cacheable(
             cacheNames = PRICE_CACHE,
-            key = "#p0 == null ? null : #p0.trim().toUpperCase(T(java.util.Locale).ROOT)",
-            sync = true
+            key = "#p0 == null ? null : #p0.trim().toUpperCase(T(java.util.Locale).ROOT)"
     )
     public PriceResponse getPrice(String requestedInstrument) {
         String instrument = normalize(requestedInstrument);

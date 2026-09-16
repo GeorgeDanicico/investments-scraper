@@ -1,6 +1,7 @@
 HELP.md
 # Maven build output and OpenAPI-generated sources
 target/
+logs/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/

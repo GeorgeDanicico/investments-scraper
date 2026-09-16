@@ -24,7 +24,8 @@ WORKDIR /app
 COPY --from=build /workspace/target/investment /app/investment
 
 RUN useradd --system --no-create-home --shell /usr/sbin/nologin appuser \
-    && chown appuser:appuser /app/investment
+    && mkdir -p /app/logs \
+    && chown -R appuser:appuser /app
 
 USER appuser
 
