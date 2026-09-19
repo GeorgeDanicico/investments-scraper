@@ -26,7 +26,7 @@ class PriceServiceCacheTest {
     private ZfPriceClient zfPriceClient;
 
     @Autowired
-    private PriceService priceService;
+    private PriceController priceController;
 
     @Autowired
     private CacheManager cacheManager;
@@ -47,8 +47,8 @@ class PriceServiceCacheTest {
         );
         when(yahooPriceClient.fetch("VUAA.DE")).thenReturn(expected);
 
-        assertEquals(expected, priceService.getPrice("vuaa.de"));
-        assertEquals(expected, priceService.getPrice("VUAA.DE"));
+        assertEquals(expected, priceController.getPrice("vuaa.de"));
+        assertEquals(expected, priceController.getPrice("VUAA.DE"));
 
         verify(yahooPriceClient, times(1)).fetch("VUAA.DE");
 

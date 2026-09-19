@@ -15,6 +15,6 @@ public class PriceController implements PricesApi {
 
     @Override
     public PriceResponse getPrice(String instrument) {
-        return priceService.getPrice(instrument);
+        return priceService.getPrice(PriceService.normalize(instrument));
     }
 }

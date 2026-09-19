@@ -23,17 +23,16 @@ public class PriceService {
 
     @Cacheable(
             cacheNames = PRICE_CACHE,
-            key = "#p0 == null ? null : #p0.trim().toUpperCase(T(java.util.Locale).ROOT)"
+            key = "#p0"
     )
-    public PriceResponse getPrice(String requestedInstrument) {
-        String instrument = normalize(requestedInstrument);
+    public PriceResponse getPrice(String instrument) {
         if (BT_EURO_CLASIC.equals(instrument)) {
             return zfPriceClient.fetch(instrument);
         }
         return yahooPriceClient.fetch(instrument);
     }
 
-    private static String normalize(String requestedInstrument) {
+    static String normalize(String requestedInstrument) {
         if (requestedInstrument == null) {
             throw new IllegalArgumentException("Instrument is required");
         }
