@@ -5,12 +5,17 @@ set -Eeuo pipefail
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
+APP_NAME="${APP_NAME:-investment}"
+CONTAINER_NAME="${CONTAINER_NAME:-$APP_NAME}"
 IMAGE_NAME="${IMAGE_NAME:-ghcr.io/georgedanicico/investments-scraper:${IMAGE_TAG:-native}}"
-CONTAINER_NAME="${CONTAINER_NAME:-investment}"
 HOST_PORT="${HOST_PORT:-8080}"
 CONTAINER_PORT="${CONTAINER_PORT:-8080}"
 LOG_VOLUME="${LOG_VOLUME:-investment_logs}"
+DOCKER_NETWORK="${DOCKER_NETWORK:-expense-network}"
+NATIVE_RUNTIME_OPTIONS="${NATIVE_RUNTIME_OPTIONS:--Xms16m -Xmx64m}"
 STOP_TIMEOUT="${STOP_TIMEOUT:-30}"
+
+read -r -a APP_COMMAND <<< "$NATIVE_RUNTIME_OPTIONS"
 
 if ! command -v docker >/dev/null 2>&1; then
     echo "Docker is not installed or is not available in PATH." >&2
@@ -38,10 +43,12 @@ docker volume inspect "$LOG_VOLUME" >/dev/null 2>&1 || \
 echo "Starting container: $CONTAINER_NAME"
 docker run --detach \
     --name "$CONTAINER_NAME" \
+    --network "$DOCKER_NETWORK" \
     --restart unless-stopped \
     --publish "$HOST_PORT:$CONTAINER_PORT" \
     --mount "type=volume,source=$LOG_VOLUME,target=/app/logs" \
-    "$IMAGE_NAME"
+    "$IMAGE_NAME" \
+    "${APP_COMMAND[@]}"
 
 if command -v curl >/dev/null 2>&1; then
     echo "Waiting for the application health endpoint..."
